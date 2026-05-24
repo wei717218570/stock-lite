@@ -5416,6 +5416,9 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 var currentCode = "300295.XSHE";
 var currentIndex = -1;
 var turnRatioVals = [];
+var INDEX_DATA = null;
+var SIGNAL_COUNTS = null;
+var signalScope = 'all';
 
 // ---- Column header matching DATA_COLUMNS order ----
 var _H = ['open','close','high','low','volume','Q','delta_Q','delta_S_trend','smart_vol_ratio',
