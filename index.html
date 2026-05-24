@@ -52,9 +52,9 @@ body { margin: 0; padding: 0; font-family: "Microsoft YaHei", Arial, sans-serif;
 </head>
 <body>
 <script>
-// === Password Gate (separate script - runs before chart JS) ===
+// === Password Gate (runs after DOM ready) ===
 if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=String(this);while(s.length<n)s=c+s;return s;};}
-(function(){
+document.addEventListener('DOMContentLoaded',function(){
   var KEY='smf_auth_'+location.pathname;
   if(sessionStorage.getItem(KEY)==='1'){
     var o=document.getElementById('auth-overlay');if(o)o.style.display='none';
@@ -81,19 +81,15 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
       }
     }catch(e){alert('Auth Error:'+e.message);}
   }
-  function bind(){
-    var btn=document.getElementById('auth-btn');
-    var inp=document.getElementById('auth-input');
-    if(!btn||!inp){setTimeout(bind,100);return;}
-    btn.addEventListener('click',check);
-    btn.addEventListener('touchend',function(e){e.preventDefault();check();});
-    inp.addEventListener('keydown',function(e){
-      if(e.key==='Enter'||e.keyCode===13)check();
-    });
-    setTimeout(function(){try{inp.focus();}catch(e){}},300);
-  }
-  bind();
-})();
+  var btn=document.getElementById('auth-btn');
+  var inp=document.getElementById('auth-input');
+  btn.addEventListener('click',check);
+  btn.addEventListener('touchend',function(e){e.preventDefault();check();});
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.keyCode===13)check();
+  });
+  setTimeout(function(){try{inp.focus();}catch(e){}},300);
+});
 </script>
 <div id="auth-overlay"><div id="auth-box"><h2>Smart Money Factor</h2><p>请输入访问密码</p><input type="password" id="auth-input" placeholder="请输入密码" autocomplete="off"><button id="auth-btn">进入系统</button><div id="auth-error">密码错误，请重新输入</div></div></div>
 
@@ -5419,6 +5415,8 @@ var turnRatioVals = [];
 var INDEX_DATA = null;
 var SIGNAL_COUNTS = null;
 var signalScope = 'all';
+
+function getSignalBarData(dates) { return []; }
 
 // ---- Column header matching DATA_COLUMNS order ----
 var _H = ['open','close','high','low','volume','Q','delta_Q','delta_S_trend','smart_vol_ratio',
