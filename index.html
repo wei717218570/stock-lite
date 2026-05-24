@@ -36,7 +36,7 @@ body { margin: 0; padding: 0; font-family: "Microsoft YaHei", Arial, sans-serif;
 #stock-list-container.hide-st .stock-item[data-st="st"] { display: none !important; }
 .new-badge { display: inline-block; background: #ff5722; color: #fff; font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; margin-right: 4px; vertical-align: middle; line-height: 1.2; }
 #chart-area { flex: 1; position: relative; overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-#chart-area > div { width: 100% !important; min-width: 1100px; height: 550px !important; }
+#chart-area > div { width: 100% !important; min-width: 1100px; height: 680px !important; }
 #stock-title { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); color: #1565c0; font-size: 16px; font-weight: bold; z-index: 101; pointer-events: none; }
 #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 16px; color: #999; display: none; z-index: 200; }
 #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%); z-index: 99999; display: flex; align-items: center; justify-content: center; }
@@ -51,10 +51,11 @@ body { margin: 0; padding: 0; font-family: "Microsoft YaHei", Arial, sans-serif;
 </style>
 </head>
 <body>
+<div id="auth-overlay"><div id="auth-box"><h2>Smart Money Factor</h2><p>请输入访问密码</p><input type="password" id="auth-input" placeholder="请输入密码" autocomplete="off"><button id="auth-btn">进入系统</button><div id="auth-error">密码错误，请重新输入</div></div></div>
 <script>
-// === Password Gate (runs after DOM ready) ===
+// === Password Gate ===
 if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=String(this);while(s.length<n)s=c+s;return s;};}
-document.addEventListener('DOMContentLoaded',function(){
+(function(){
   var KEY='smf_auth_'+location.pathname;
   if(sessionStorage.getItem(KEY)==='1'){
     var o=document.getElementById('auth-overlay');if(o)o.style.display='none';
@@ -89,9 +90,8 @@ document.addEventListener('DOMContentLoaded',function(){
     if(e.key==='Enter'||e.keyCode===13)check();
   });
   setTimeout(function(){try{inp.focus();}catch(e){}},300);
-});
+})();
 </script>
-<div id="auth-overlay"><div id="auth-box"><h2>Smart Money Factor</h2><p>请输入访问密码</p><input type="password" id="auth-input" placeholder="请输入密码" autocomplete="off"><button id="auth-btn">进入系统</button><div id="auth-error">密码错误，请重新输入</div></div></div>
 
 <div id="sidebar">
   <h3>Stock List</h3>
@@ -5622,10 +5622,10 @@ function buildOption(code, stock) {
         },
         axisPointer:{show:true,link:[{xAxisIndex:'all'}]},
         dataZoom:[{show:true,type:'inside',xAxisIndex:[0,1],start:0,end:100,zoomOnMouseWheel:true,moveOnMouseMove:true,moveOnMouseWheel:false,zoomLock:false,preventDefaultMouseMove:false},{show:true,type:'slider',xAxisIndex:[0,1],start:0,end:100,bottom:'2%'}],
-        grid:[{left:'10%',right:'3%',top:'3%',height:'65%'},{left:'10%',right:'3%',top:'72%',height:'22%'}],
+        grid:[{left:'10%',right:'3%',top:'3%',height:'70%'},{left:'10%',right:'3%',top:'76%',height:'20%'}],
         xAxis:[{type:'category',data:dates,gridIndex:0,boundaryGap:false,axisPointer:{show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.8)',width:1}},axisLabel:{fontSize:9,interval:Math.floor(n/12)||0}},{type:'category',data:dates,gridIndex:1,boundaryGap:false,axisPointer:{show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.8)',width:1}},axisLabel:{fontSize:9,interval:Math.floor(n/12)||0}}],
         yAxis:[{name:'Price',gridIndex:0,splitArea:{show:true,areaStyle:{opacity:0.3}},axisLabel:{formatter:function(v){return typeof v==='number'?v.toFixed(2):v;}}},{name:'Volume',gridIndex:1,max:maxVol*1.2||1,axisLabel:{show:false},splitLine:{show:false}}],
-        series:[{name:'K-Line',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:klineData,itemStyle:{color:'#d32f2f',color0:'#388e3c',borderColor:'#d32f2f',borderColor0:'#388e3c'},markPoint:marks.length>0?{data:marks,label:{show:false}}:undefined},{name:'MA5',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa5,showSymbol:false,lineStyle:{width:1.5,color:'#ff9800'},itemStyle:{color:'#ff9800'}},{name:'MA10',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa10,showSymbol:false,lineStyle:{width:1.5,color:'#2196f3'},itemStyle:{color:'#2196f3'}},{name:'MA20',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa20,showSymbol:false,lineStyle:{width:1.5,color:'#9c27b0'},itemStyle:{color:'#9c27b0'}},{name:'Change%',type:'line',xAxisIndex:0,yAxisIndex:0,data:pctStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'Turnover%',type:'line',xAxisIndex:0,yAxisIndex:0,data:trStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'ATR%',type:'line',xAxisIndex:0,yAxisIndex:0,data:atrVals.map(function(v){return v!=null?v.toFixed(1)+'%':'-';}),showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'BlastSens',type:'line',xAxisIndex:0,yAxisIndex:0,data:blastSensVals,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'Volume',type:'bar',xAxisIndex:1,yAxisIndex:1,data:volumeData,itemStyle:{opacity:0.5}}]
+        series:[{name:'K-Line',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:klineData,itemStyle:{color:'#d32f2f',color0:'#388e3c',borderColor:'#d32f2f',borderColor0:'#388e3c'},markPoint:marks.length>0?{data:marks,label:{show:false}}:undefined},{name:'MA5',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa5,showSymbol:false,lineStyle:{width:1.5,color:'#ff9800'},itemStyle:{color:'#ff9800'}},{name:'MA10',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa10,showSymbol:false,lineStyle:{width:1.5,color:'#2196f3'},itemStyle:{color:'#2196f3'}},{name:'MA20',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa20,showSymbol:false,lineStyle:{width:1.5,color:'#9c27b0'},itemStyle:{color:'#9c27b0'}},{name:'Change%',type:'line',xAxisIndex:0,yAxisIndex:0,data:pctStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'Turnover%',type:'line',xAxisIndex:0,yAxisIndex:0,data:trStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'ATR%',type:'line',xAxisIndex:0,yAxisIndex:0,data:atrVals.map(function(v){return (v!=='-'&&v!=null)?v.toFixed(1)+'%':'-';}),showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'BlastSens',type:'line',xAxisIndex:0,yAxisIndex:0,data:blastSensVals,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'Volume',type:'bar',xAxisIndex:1,yAxisIndex:1,data:volumeData,itemStyle:{opacity:0.5}}]
     };
 }
 
