@@ -5631,17 +5631,11 @@ function updateKeyLabels(idx) {
     var opt=chart.getOption(),s=opt.series;
     var xData=opt.xAxis&&opt.xAxis[0]&&opt.xAxis[0].data;
     if(xData&&idx>=0&&idx<xData.length){lblDate.textContent=xData[idx];lblDate.style.display='';posLabel(lblDate);}else{lblDate.style.display='none';}
-    var ca=null,ta=null,da=null,illiqD=null,dsa=[],apa=null,canchaD=null,krrD=null;
+    var ca=null,ta=null;
     for(var i=0;i<s.length;i++){
-        if(s[i].name==='Change%')ca=s[i].data;if(s[i].name==='Turnover%')ta=s[i].data;
-        if(s[i].name==='Rolling DeltaQ (5d)')da=s[i].data;
-        if(s[i].name==='ILLIQ')illiqD=s[i].data;
-        if(s[i].name&&s[i].name.indexOf('Rolling \u0394S(5d)')===0)dsa.push(s[i].data);
-        if(s[i].name==='ATR%')apa=s[i].data;
-        if(s[i].name==='\u0394S\u6b8b\u5dee')canchaD=s[i].data;
-        if(s[i].name==='KRR_Q\u6b8b\u5dee')krrD=s[i].data;
+        if(s[i].name==='Change%')ca=s[i].data;
+        if(s[i].name==='Turnover%')ta=s[i].data;
     }
-    var blastD=null;for(var i=0;i<s.length;i++){if(s[i].name==='BlastSens')blastD=s[i].data;}
     if(ca&&idx<ca.length){var cv=ca[idx],cs=Array.isArray(cv)?cv[cv.length-1]:cv;if(cs!=null&&cs!=='-'){var cn=parseFloat(cs),txt='Change: '+cs;if(ta&&idx<ta.length){var tv=ta[idx],ts=Array.isArray(tv)?tv[tv.length-1]:tv;if(ts!=null&&ts!=='-')txt+='  |  \u6362\u624b: '+ts;}lblChange.textContent=txt;lblChange.style.color=cn>=0?'#d32f2f':'#388e3c';lblChange.style.display='';posLabel(lblChange);}else lblChange.style.display='none';}else lblChange.style.display='none';
 }
 
