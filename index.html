@@ -5468,10 +5468,10 @@ function makeLabel(top) {
     chartDom.appendChild(el);
     return el;
 }
-var lblChange = makeLabel('8%'); lblChange.style.color = '#d32f2f';
+var lblChange = makeLabel('35%'); lblChange.style.color = '#d32f2f';
 var lblDate = makeLabel('4%'); lblDate.style.color = '#333'; lblDate.style.fontSize = '11px';
-var lblBlast = makeLabel('27%'); lblBlast.style.color = '#2196f3';
-var lblATR = makeLabel('62%'); lblATR.style.color = '#ff5722';
+var lblBlast = makeLabel('83%'); lblBlast.style.color = '#2196f3';
+var lblATR = makeLabel('50%'); lblATR.style.color = '#ff5722';
 
 function posLabel(el) {
     var cw = chartDom.offsetWidth;
@@ -5485,318 +5485,148 @@ function hideAllLabels() {
     lblATR.style.display='none';lblBlast.style.display='none';
 }
 
-// ---- buildOption (extracted from multi_factor_chart.py, stock passed as param) ----
+// ---- buildOption (lite版: K线 + 成交量 + 全部标记) ----
 function buildOption(code, stock) {
-
-        var data = stock.data;
-        var n = data.length;
-        var dates=[], klineData=[], closePrices=[], pctChanges=[0], volumeData=[];
-        var dqVals=[], illiqVals=[], dstVals=[], rdqVals=[], rdstVals=[], svrVals=[], trVals=[];
-        var krrQVals=[];
-        var blastSensVals=[];
-
-        for (var i = 0; i < n; i++) {
-            var r = data[i];
-            var ds = r.date; if (ds.length > 10) ds = ds.substring(0,10);
-            dates.push(ds);
-            klineData.push([r.open, r.close, r.low, r.high]);
-            closePrices.push(r.close);
-            var vol = r.volume;
-            volumeData.push({value: vol, itemStyle: {color: r.close >= r.open ? '#d32f2f' : '#388e3c'}});
-            if (i > 0 && closePrices[i-1] > 0) pctChanges.push(+((r.close - closePrices[i-1]) / closePrices[i-1] * 100).toFixed(2));
-            else if (i > 0) pctChanges.push(0);
-
-            dqVals.push(r.delta_Q != null ? +(r.delta_Q * 100).toFixed(4) : '-');
-            illiqVals.push(r.illiq != null ? +(r.illiq * 1e10).toFixed(4) : '-');
-            dstVals.push(r.delta_S_trend != null ? +(r.delta_S_trend * 1e5).toFixed(2) : '-');
-            rdqVals.push(r.rolling_delta_Q != null ? +(r.rolling_delta_Q * 100).toFixed(4) : '-');
-            rdstVals.push(r.rolling_delta_S_trend != null ? +(r.rolling_delta_S_trend * 1e5).toFixed(2) : '-');
-            svrVals.push(r.smart_vol_ratio != null ? r.smart_vol_ratio : '-');
-            trVals.push(r.turnover_ratio != null ? r.turnover_ratio : null);
-            krrQVals.push(r.krr_q_resid != null ? +r.krr_q_resid.toFixed(6) : '-');
-            blastSensVals.push(r.blast_sens != null ? +r.blast_sens.toFixed(4) : '-');
-            turnRatioVals.push(r.turn_ratio != null ? +r.turn_ratio.toFixed(4) : '-');
+    var data = stock.data;
+    var n = data.length;
+    var dates=[], klineData=[], closePrices=[], pctChanges=[0], volumeData=[];
+    var dqVals=[], dstVals=[], rdqVals=[], rdstVals=[], trVals=[];
+    var krrQVals=[], blastSensVals=[];
+    for (var i = 0; i < n; i++) {
+        var r = data[i];
+        var ds = r.date; if (ds.length > 10) ds = ds.substring(0,10);
+        dates.push(ds);
+        klineData.push([r.open, r.close, r.low, r.high]);
+        closePrices.push(r.close);
+        var vol = r.volume;
+        volumeData.push({value: vol, itemStyle: {color: r.close >= r.open ? '#d32f2f' : '#388e3c'}});
+        if (i > 0 && closePrices[i-1] > 0) pctChanges.push(+((r.close - closePrices[i-1]) / closePrices[i-1] * 100).toFixed(2));
+        else if (i > 0) pctChanges.push(0);
+        dqVals.push(r.delta_Q != null ? +(r.delta_Q * 100).toFixed(4) : '-');
+        dstVals.push(r.delta_S_trend != null ? +(r.delta_S_trend * 1e5).toFixed(2) : '-');
+        rdqVals.push(r.rolling_delta_Q != null ? +(r.rolling_delta_Q * 100).toFixed(4) : '-');
+        rdstVals.push(r.rolling_delta_S_trend != null ? +(r.rolling_delta_S_trend * 1e5).toFixed(2) : '-');
+        trVals.push(r.turnover_ratio != null ? r.turnover_ratio : null);
+        krrQVals.push(r.krr_q_resid != null ? +r.krr_q_resid.toFixed(6) : '-');
+        blastSensVals.push(r.blast_sens != null ? +r.blast_sens.toFixed(4) : '-');
+        turnRatioVals.push(r.turn_ratio != null ? +r.turn_ratio.toFixed(4) : '-');
+    }
+    var pctStr = []; for (var i=0;i<n;i++) pctStr.push(pctChanges[i].toFixed(2)+'%');
+    var trStr = []; for (var i=0;i<n;i++) trStr.push(trVals[i]!=null ? trVals[i].toFixed(2)+'%' : '-');
+    // MA5/10/20
+    var priceMa5=[],priceMa10=[],priceMa20=[];
+    for(var i=0;i<n;i++){
+        var s5=0,c5=0;for(var j=Math.max(0,i-4);j<=i;j++){s5+=closePrices[j];c5++;}priceMa5.push(c5>=5?+(s5/c5).toFixed(2):'-');
+        var s10=0,c10=0;for(var j=Math.max(0,i-9);j<=i;j++){s10+=closePrices[j];c10++;}priceMa10.push(c10>=10?+(s10/c10).toFixed(2):'-');
+        var s20=0,c20=0;for(var j=Math.max(0,i-19);j<=i;j++){s20+=closePrices[j];c20++;}priceMa20.push(c20>=20?+(s20/c20).toFixed(2):'-');
+    }
+    // ATR(14)
+    var atrPeriod=14, atrVals=[], trArr=[];
+    for(var i=0;i<n;i++){var hi=data[i].high,lo=data[i].low;if(i===0){trArr.push(hi-lo);}else{var pc=data[i-1].close;trArr.push(Math.max(hi-lo,Math.abs(hi-pc),Math.abs(lo-pc)));}}
+    for(var i=0;i<n;i++){if(i<atrPeriod-1){atrVals.push('-');}else if(i===atrPeriod-1){var s=0;for(var k=0;k<atrPeriod;k++)s+=trArr[k];atrVals.push(+(s/atrPeriod).toFixed(4));}else{atrVals.push(+((atrVals[i-1]*(atrPeriod-1)+trArr[i])/atrPeriod).toFixed(4));}}
+    // DeltaS残差
+    var canchaPeriod=20, canchaVals=[];
+    for(var i=0;i<n;i++){
+        if(i<canchaPeriod-1||data[i].close<=0||data[i].volume<=0){canchaVals.push('-');continue;}
+        var lnY=[],lnX=[];
+        for(var k=i-canchaPeriod+1;k<=i;k++){if(data[k].close>0&&data[k].volume>0){lnY.push(Math.log(data[k].close));lnX.push(Math.log(data[k].volume));}}
+        if(lnX.length<10){canchaVals.push('-');continue;}
+        var sx=0,sy=0;for(var j=0;j<lnX.length;j++){sx+=lnX[j];sy+=lnY[j];}
+        var mx=sx/lnX.length,my=sy/lnY.length;
+        var num=0,den=0;
+        for(var j=0;j<lnX.length;j++){var dx=lnX[j]-mx;num+=dx*(lnY[j]-my);den+=dx*dx;}
+        if(den===0){canchaVals.push('-');continue;}
+        var beta=num/den, alpha=my-beta*mx;
+        var yi=Math.log(data[i].close), xi=Math.log(data[i].volume);
+        var resid=yi-(alpha+beta*xi);
+        canchaVals.push(+resid.toFixed(6));
+    }
+    // 买入信号
+    var marks=[];
+    var signalDays=[];
+    for (var i=0;i<n;i++){
+        var dst=rdstVals[i], dq=rdqVals[i], tr=trVals[i], lp=data[i].low*0.99;
+        signalDays.push(false);
+        if(canchaVals[i]!=='-'&&canchaVals[i]>0.05) marks.push({coord:[dates[i],lp],symbol:'arrow',symbolSize:12,itemStyle:{color:'#9c27b0'}});
+        if(blastSensVals[i]!=='-'&&blastSensVals[i]>0&&turnRatioVals[i]!=='-'&&turnRatioVals[i]>0){
+            var ratio=turnRatioVals[i]/blastSensVals[i];
+            if(Math.abs(ratio-1)<0.2) marks.push({coord:[dates[i],lp],symbol:'diamond',symbolSize:12,itemStyle:{color:'#2196f3'}});
         }
-
-        var pctStr = []; for (var i=0;i<n;i++) pctStr.push(pctChanges[i].toFixed(2)+'%');
-        var trStr = []; for (var i=0;i<n;i++) trStr.push(trVals[i]!=null ? trVals[i].toFixed(2)+'%' : '-');
-
-        // 价格均线 (MA5/MA10/MA20)
-        var priceMa5=[],priceMa10=[],priceMa20=[];
-        for(var i=0;i<n;i++){
-            var s5=0,c5=0;for(var j=Math.max(0,i-4);j<=i;j++){s5+=closePrices[j];c5++;}priceMa5.push(c5>=5?+(s5/c5).toFixed(2):'-');
-            var s10=0,c10=0;for(var j=Math.max(0,i-9);j<=i;j++){s10+=closePrices[j];c10++;}priceMa10.push(c10>=10?+(s10/c10).toFixed(2):'-');
-            var s20=0,c20=0;for(var j=Math.max(0,i-19);j<=i;j++){s20+=closePrices[j];c20++;}priceMa20.push(c20>=20?+(s20/c20).toFixed(2):'-');
-        }
-
-        // 正负分色
-        function split(v) { var p=[],ne=[]; for(var i=0;i<n;i++){if(v[i]!=='-'&&v[i]>0){p.push(v[i]);ne.push('-');}else if(v[i]!=='-'){p.push('-');ne.push(v[i]);}else{p.push('-');ne.push('-');}} return [p,ne]; }
-        var dqSplit=split(dqVals), dqPos=dqSplit[0], dqNeg=dqSplit[1];
-        var dstSplit=split(dstVals), dstPos=dstSplit[0], dstNeg=dstSplit[1];
-        var rdstGold=[], rdstPurple=[];
-        for (var i=0;i<n;i++){var v=rdstVals[i];if(v!=='-'&&v>5){rdstGold.push(v);rdstPurple.push('-');}else if(v!=='-'){rdstGold.push('-');rdstPurple.push(v);}else{rdstGold.push('-');rdstPurple.push('-');}}
-
-        // ATR(14)
-        var atrPeriod=14, atrVals=[], trArr=[];
-        for(var i=0;i<n;i++){var hi=data[i].high,lo=data[i].low;if(i===0){trArr.push(hi-lo);}else{var pc=data[i-1].close;trArr.push(Math.max(hi-lo,Math.abs(hi-pc),Math.abs(lo-pc)));}}
-        for(var i=0;i<n;i++){if(i<atrPeriod-1){atrVals.push('-');}else if(i===atrPeriod-1){var s=0;for(var k=0;k<atrPeriod;k++)s+=trArr[k];atrVals.push(+(s/atrPeriod).toFixed(4));}else{atrVals.push(+((atrVals[i-1]*(atrPeriod-1)+trArr[i])/atrPeriod).toFixed(4));}}
-
-        // ATR百分位(50日) + 三期判断
-        var atrLookback=50, atrPct=[];
-        for(var i=0;i<n;i++){
-            if(atrVals[i]==='-'||i<atrLookback-1){atrPct.push(null);continue;}
-            var win=[];for(var k=Math.max(0,i-atrLookback+1);k<=i;k++){if(atrVals[k]!=='-')win.push(atrVals[k]);}
-            if(win.length<10){atrPct.push(null);continue;}
-            var cnt=0;for(var w=0;w<win.length;w++){if(win[w]<atrVals[i])cnt++;}
-            atrPct.push(+(cnt/win.length*100).toFixed(1));
-        }
-        var sqAreas=[],inSq=false,sqStart=null;
-        for(var i=0;i<n;i++){if(atrPct[i]!=null&&atrPct[i]<20){if(!inSq){sqStart=i;inSq=true;}}else{if(inSq&&sqStart!=null){sqAreas.push([{xAxis:dates[sqStart]},{xAxis:dates[i]}]);inSq=false;}}}
-        if(inSq&&sqStart!=null){sqAreas.push([{xAxis:dates[sqStart]},{xAxis:dates[dates.length-1]}]);}
-
-        // DeltaS残差 - 正交化
-        var canchaPeriod=20, canchaVals=[];
-        for(var i=0;i<n;i++){
-            if(i<canchaPeriod-1||data[i].close<=0||data[i].volume<=0){canchaVals.push('-');continue;}
-            var lnY=[],lnX=[];
-            for(var k=i-canchaPeriod+1;k<=i;k++){
-                if(data[k].close>0&&data[k].volume>0){lnY.push(Math.log(data[k].close));lnX.push(Math.log(data[k].volume));}
+        if(dq!=='-'&&dq>1.8&&tr!=null&&tr>10) marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:'#00c853'}});
+        if(dst!=='-'&&dst>5&&canchaVals[i]!=='-'&&canchaVals[i]>0) marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:'#ffd700'}});
+        var isRed=dst!=='-'&&dst>5&&tr!=null&&tr>10&&tr<19;
+        var isYellow=dst!=='-'&&dst>5&&tr!=null&&tr>5&&tr<10;
+        if(isRed||isYellow){
+            var filtered=false;
+            var c=data[i].close;
+            if(canchaVals[i]==='-'||canchaVals[i]<=0) filtered=true;
+            if(!filtered&&i>0){var pDq=rdqVals[i-1],pTr=trVals[i-1];if(pDq!=='-'&&pDq>1.8&&pTr!=null&&pTr>10) filtered=true;}
+            if(!filtered){for(var j=Math.max(0,i-5);j<i;j++){if(signalDays[j]&&data[j].close<c){filtered=true;break;}}}
+            if(!filtered){
+                var oo=data[i].open,hh=data[i].high,ll=data[i].low;
+                var us=hh-Math.max(oo,c),ls=Math.min(oo,c)-ll,bd=Math.abs(c-oo),tr2=hh-ll;
+                var cond1=bd>0&&us>bd*2.5;
+                var cond2=tr2>0&&us/tr2>0.6;
+                var cond3=bd>0&&ls<bd*0.5;
+                var cond4=i>0&&data[i-1].close>0&&tr2/data[i-1].close*100>6;
+                var cond5=bd>0&&atrVals[i]!=='-'&&bd>atrVals[i]*0.002;
+                if(cond1&&cond2&&cond3&&cond4&&cond5) filtered=true;
             }
-            if(lnX.length<10){canchaVals.push('-');continue;}
-            var sx=0,sy=0;for(var j=0;j<lnX.length;j++){sx+=lnX[j];sy+=lnY[j];}
-            var mx=sx/lnX.length,my=sy/lnY.length;
-            var num=0,den=0;
-            for(var j=0;j<lnX.length;j++){var dx=lnX[j]-mx;num+=dx*(lnY[j]-my);den+=dx*dx;}
-            if(den===0){canchaVals.push('-');continue;}
-            var beta=num/den, alpha=my-beta*mx;
-            var yi=Math.log(data[i].close), xi=Math.log(data[i].volume);
-            var resid=yi-(alpha+beta*xi);
-            canchaVals.push(+resid.toFixed(6));
+            if(!filtered){var color=isRed?'#ff0000':'#ffc107';marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:color}});signalDays[i]=true;}
         }
-        var canchaPos=[],canchaNeg=[];
-        for(var i=0;i<n;i++){if(canchaVals[i]!=='-'&&canchaVals[i]>0){canchaPos.push(canchaVals[i]);canchaNeg.push('-');}else if(canchaVals[i]!=='-'){canchaPos.push('-');canchaNeg.push(canchaVals[i]);}else{canchaPos.push('-');canchaNeg.push('-');}}
-
-        // 买入信号(含过滤)
-        var marks=[];
-        var signalDays=[];
-        for (var i=0;i<n;i++){
-            var dst=rdstVals[i], dq=rdqVals[i], tr=trVals[i], lp=data[i].low*0.99;
-            signalDays.push(false);
-            if(canchaVals[i]!=='-'&&canchaVals[i]>0.05) marks.push({coord:[dates[i],lp],symbol:'arrow',symbolSize:12,itemStyle:{color:'#9c27b0'}});
-            if(blastSensVals[i]!=='-'&&blastSensVals[i]>0&&turnRatioVals[i]!=='-'&&turnRatioVals[i]>0){
-                var ratio=turnRatioVals[i]/blastSensVals[i];
-                if(Math.abs(ratio-1)<0.2) marks.push({coord:[dates[i],lp],symbol:'diamond',symbolSize:12,itemStyle:{color:'#2196f3'}});
-            }
-            if(dq!=='-'&&dq>1.8&&tr!=null&&tr>10) marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:'#00c853'}});
-            if(dst!=='-'&&dst>5&&canchaVals[i]!=='-'&&canchaVals[i]>0) marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:'#ffd700'}});
-            var isRed=dst!=='-'&&dst>5&&tr!=null&&tr>10&&tr<19;
-            var isYellow=dst!=='-'&&dst>5&&tr!=null&&tr>5&&tr<10;
-            if(isRed||isYellow){
-                var filtered=false;
-                var c=data[i].close;
-                if(canchaVals[i]==='-'||canchaVals[i]<=0) filtered=true;
-                if(!filtered&&i>0){var pDq=rdqVals[i-1],pTr=trVals[i-1];if(pDq!=='-'&&pDq>1.8&&pTr!=null&&pTr>10) filtered=true;}
-                if(!filtered){for(var j=Math.max(0,i-5);j<i;j++){if(signalDays[j]&&data[j].close<c){filtered=true;break;}}}
-                if(!filtered){
-                    var oo=data[i].open,hh=data[i].high,ll=data[i].low;
-                    var us=hh-Math.max(oo,c),ls=Math.min(oo,c)-ll,bd=Math.abs(c-oo),tr2=hh-ll;
-                    var cond1=bd>0&&us>bd*2.5;
-                    var cond2=tr2>0&&us/tr2>0.6;
-                    var cond3=bd>0&&ls<bd*0.5;
-                    var cond4=i>0&&data[i-1].close>0&&tr2/data[i-1].close*100>6;
-                    var cond5=bd>0&&atrVals[i]!=='-'&&bd>atrVals[i]*0.002;
-                    if(cond1&&cond2&&cond3&&cond4&&cond5) filtered=true;
+    }
+    // 五角星合并
+    (function(){
+        var byDate={};
+        for(var i=0;i<marks.length;i++){
+            var d=marks[i].coord[0];
+            if(!byDate[d])byDate[d]=[];
+            byDate[d].push(i);
+        }
+        var starPath='path://M512 0L632 384H1024L704 640L816 1024L512 768L208 1024L320 640L0 384H392Z';
+        for(var d in byDate){
+            var idxs=byDate[d];
+            if(idxs.length>=2){
+                var colors=idxs.map(function(idx){return marks[idx].itemStyle.color;});
+                var di=-1;for(var x=0;x<dates.length;x++){if(dates[x]===d){di=x;break;}}
+                var hp=di>=0?data[di].high*1.02:marks[idxs[0]].coord[1];
+                var colorStops=[];
+                for(var k=0;k<colors.length;k++){
+                    colorStops.push({offset:k/colors.length,color:colors[k]});
+                    colorStops.push({offset:(k+1)/colors.length,color:colors[k]});
                 }
-                if(!filtered){var color=isRed?'#ff0000':'#ffc107';marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:color}});signalDays[i]=true;}
+                marks.push({coord:[d,hp],symbol:starPath,symbolSize:22,itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:colorStops}}});
             }
         }
-        // 同日多信号时，在K线上方叠加五角星(双色/三色)，下方原始标记保留
-        (function(){
-            var byDate={};
-            for(var i=0;i<marks.length;i++){
-                var d=marks[i].coord[0];
-                if(!byDate[d])byDate[d]=[];
-                byDate[d].push(i);
+    })();
+    var maxVol=0;
+    for (var i=0;i<n;i++){if(data[i].volume>maxVol)maxVol=data[i].volume;}
+    document.getElementById('stock-title').textContent = stock.name + ' (' + code + ')';
+    return {
+        backgroundColor: '#fff',
+        tooltip: {show:true,trigger:'axis',axisPointer:{show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.6)',width:1,type:'solid'}},backgroundColor:'transparent',borderWidth:0,borderColor:'transparent',padding:0,textStyle:{fontSize:0,color:'transparent'},extraCssText:'visibility:hidden;',
+            formatter: function(params) {
+                if(!params||params.length===0)return '';
+                var dateStr=params[0].name||'';
+                if(dateStr)lblDate.textContent=dateStr;lblDate.style.display=dateStr?'':'none';posLabel(lblDate);
+                var cp=null,tr=null;
+                for(var i=0;i<params.length;i++){
+                    if(params[i].seriesName==='Change%')cp=params[i];
+                    if(params[i].seriesName==='Turnover%')tr=params[i];
+                }
+                if(cp&&cp.value&&cp.value!=='-'){var cv=Array.isArray(cp.value)?cp.value[cp.value.length-1]:cp.value;var cvN=parseFloat(cv);var txt='Change: '+cv;if(tr&&tr.value&&tr.value!=='-'){var tv=Array.isArray(tr.value)?tr.value[tr.value.length-1]:tr.value;if(tv!=='-')txt+='  |  \u6362\u624b: '+tv;}lblChange.textContent=txt;lblChange.style.color=cvN>=0?'#d32f2f':'#388e3c';lblChange.style.display='';posLabel(lblChange);}else{lblChange.style.display='none';}
+                var blast=null;for(var i=0;i<params.length;i++){if(params[i].seriesName==='BlastSens')blast=params[i];}
+                if(blast&&blast.value!==undefined&&blast.value!=='-'&&blast.value!==null){var bv=Array.isArray(blast.value)?blast.value[blast.value.length-1]:blast.value;var trInfo=turnRatioVals[params[0].dataIndex];var trLabel=(trInfo!=='-'&&trInfo!=null)?' TR:'+parseFloat(trInfo).toFixed(2):'';lblBlast.textContent='BS:'+(typeof bv==='number'?bv.toFixed(2):bv)+trLabel;lblBlast.style.display='';posLabel(lblBlast);}else{lblBlast.style.display='none';}
+                return '';
             }
-            var starPath='path://M512 0L632 384H1024L704 640L816 1024L512 768L208 1024L320 640L0 384H392Z';
-            for(var d in byDate){
-                var idxs=byDate[d];
-                if(idxs.length>=2){
-                    var colors=idxs.map(function(idx){return marks[idx].itemStyle.color;});
-                    var di=-1;for(var x=0;x<dates.length;x++){if(dates[x]===d){di=x;break;}}
-                    var hp=di>=0?data[di].high*1.02:marks[idxs[0]].coord[1];
-                    // 双色：左半/右半；三色：左/中/右 各占1/3
-                    var colorStops=[];
-                    for(var k=0;k<colors.length;k++){
-                        colorStops.push({offset:k/colors.length,color:colors[k]});
-                        colorStops.push({offset:(k+1)/colors.length,color:colors[k]});
-                    }
-                    marks.push({coord:[d,hp],symbol:starPath,symbolSize:22,itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:colorStops}}});
-                }
-            }
-        })();
-
-        var maxVol=0;
-        for (var i=0;i<n;i++){if(data[i].volume>maxVol)maxVol=data[i].volume;}
-
-        document.getElementById('stock-title').textContent = stock.name + ' (' + code + ')';
-
-        return {
-            backgroundColor: '#fff',
-            title: {text: stock.name + ' (' + code + ')', left: 'center', textStyle: {color: '#333', fontSize: 16}},
-            tooltip: {show:true,trigger:'axis',axisPointer:{show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.6)',width:1,type:'solid'}},backgroundColor:'transparent',borderWidth:0,borderColor:'transparent',padding:0,textStyle:{fontSize:0,color:'transparent'},extraCssText:'visibility:hidden;',
-                formatter: function(params) {
-                    if(!params||params.length===0)return '';
-                    var dateStr=params[0].name||'';
-                    if(dateStr)lblDate.textContent=dateStr;lblDate.style.display=dateStr?'':'none';posLabel(lblDate);
-                    var cp=null,tr=null,dq=null,illiq=null,dst=null,atrp=null,cancha=null,krr=null;
-                    for(var i=0;i<params.length;i++){
-                        if(params[i].seriesName==='Change%')cp=params[i];
-                        if(params[i].seriesName==='Turnover%')tr=params[i];
-                        if(params[i].seriesName==='Rolling DeltaQ (5d)')dq=params[i];
-                        if(params[i].seriesName==='ILLIQ')illiq=params[i];
-                        if(params[i].seriesName&&params[i].seriesName.indexOf('Rolling \u0394S(5d)')===0)dst=params[i];
-                        if(params[i].seriesName==='ATR%')atrp=params[i];
-                        if(params[i].seriesName==='\u0394S\u6b8b\u5dee')cancha=params[i];
-                        if(params[i].seriesName==='KRR_Q\u6b8b\u5dee')krr=params[i];
-                    }
-                    if(cp&&cp.value&&cp.value!=='-'){var cv=Array.isArray(cp.value)?cp.value[cp.value.length-1]:cp.value;var cvN=parseFloat(cv);var txt='Change: '+cv;if(tr&&tr.value&&tr.value!=='-'){var tv=Array.isArray(tr.value)?tr.value[tr.value.length-1]:tr.value;if(tv!=='-')txt+='  |  \u6362\u624b: '+tv;}lblChange.textContent=txt;lblChange.style.color=cvN>=0?'#d32f2f':'#388e3c';lblChange.style.display='';posLabel(lblChange);}else{lblChange.style.display='none';}
-                    if(krr&&krr.value!==undefined&&krr.value!=='-'&&krr.value!==null){var kv=Array.isArray(krr.value)?krr.value[krr.value.length-1]:krr.value;lblKRR.textContent='KRR_Q\u6b8b\u5dee: '+(typeof kv==='number'?kv.toFixed(6):kv);lblKRR.style.display='';posLabel(lblKRR);}else{lblKRR.style.display='none';}
-                    if(dst&&dst.value!==undefined&&dst.value!=='-'&&dst.value!==null){var sv=Array.isArray(dst.value)?dst.value[dst.value.length-1]:dst.value;lblDST.textContent='Rolling \u0394S(5d): '+(typeof sv==='number'?sv.toFixed(2):sv);lblDST.style.display='';posLabel(lblDST);}else{lblDST.style.display='none';}
-                    if(cancha&&cancha.value!==undefined&&cancha.value!=='-'&&cancha.value!==null){var cv2=Array.isArray(cancha.value)?cancha.value[cancha.value.length-1]:cancha.value;lblCancha.textContent='\u0394S\u6b8b\u5dee: '+(typeof cv2==='number'?cv2.toFixed(4):cv2);lblCancha.style.display='';posLabel(lblCancha);}else{lblCancha.style.display='none';}
-                    if(dq&&dq.value!==undefined&&dq.value!=='-'&&dq.value!==null){var dv=Array.isArray(dq.value)?dq.value[dq.value.length-1]:dq.value;lblDQ.textContent='Rolling \u0394Q(5d): '+(typeof dv==='number'?dv.toFixed(4):dv);lblDQ.style.display='';posLabel(lblDQ);}else{lblDQ.style.display='none';}
-                    if(atrp&&atrp.value!==undefined&&atrp.value!=='-'&&atrp.value!==null){lblATR.textContent='ATR%: '+atrp.value;lblATR.style.display='';posLabel(lblATR);}else{lblATR.style.display='none';}
-                    if(illiq&&illiq.value!==undefined&&illiq.value!=='-'&&illiq.value!==null){var iv=Array.isArray(illiq.value)?illiq.value[illiq.value.length-1]:illiq.value;lblILLIQ.textContent='ILLIQ: '+(typeof iv==='number'?iv.toFixed(4):iv);lblILLIQ.style.display='';posLabel(lblILLIQ);}else{lblILLIQ.style.display='none';}
-                    var blast=null;for(var i=0;i<params.length;i++){if(params[i].seriesName==='BlastSens')blast=params[i];}
-                    if(blast&&blast.value!==undefined&&blast.value!=='-'&&blast.value!==null){var bv=Array.isArray(blast.value)?blast.value[blast.value.length-1]:blast.value;var trInfo=turnRatioVals[params[0].dataIndex];var trLabel=(trInfo!=='-'&&trInfo!=null)?' TR:'+parseFloat(trInfo).toFixed(2):'';lblBlast.textContent='BS:'+(typeof bv==='number'?bv.toFixed(2):bv)+trLabel;lblBlast.style.display='';posLabel(lblBlast);}else{lblBlast.style.display='none';}
-                    // 市场子图标签
-                    if(INDEX_DATA&&INDEX_DATA.d&&params[0]){
-                        var di=params[0].dataIndex;
-                        if(di<dates.length){
-                            var dStr=dates[di];
-                            var idxMap2={};for(var k=0;k<INDEX_DATA.d.length;k++)idxMap2[INDEX_DATA.d[k][0]]=k;
-                            var ii=idxMap2[dStr];
-                            if(ii!==undefined){var ir=INDEX_DATA.d[ii];lblGEMIdx.textContent='\u521b\u4e1a\u677f\u6307: '+ir[2].toFixed(2);lblGEMIdx.style.display='';posLabel(lblGEMIdx);}else{lblGEMIdx.style.display='none';}
-                        }
-                    }else{lblGEMIdx.style.display='none';}
-                    if(SIGNAL_COUNTS&&params[0]){
-                        var di2=params[0].dataIndex;
-                        if(di2<dates.length){
-                            var dStr2=dates[di2];
-                            var scopeData2=(signalScope==='gem')?SIGNAL_COUNTS.gem:SIGNAL_COUNTS.all;
-                            var rec2=scopeData2[dStr2];
-                            if(rec2){lblSignal.textContent='\u4fe1\u53f7\u91cf: '+rec2.star+(signalScope==='gem'?' (\u521b\u4e1a\u677f)':' (\u5168\u5e02\u573a)');lblSignal.style.display='';posLabel(lblSignal);}else{lblSignal.style.display='none';}
-                        }
-                    }else{lblSignal.style.display='none';}
-                    return '';
-                }
-            },
-            axisPointer:{show:true,link:[{xAxisIndex:'all'}]},
-            dataZoom: (function(){
-                var hasKrr=krrQVals.some(function(v){return v!=='-';});
-                var cnt=hasKrr?12:11;
-                var idxs=[];for(var i=0;i<cnt;i++)idxs.push(i);
-                return [{show:true,type:'inside',xAxisIndex:idxs,start:0,end:100,zoomOnMouseWheel:true,moveOnMouseMove:true,moveOnMouseWheel:false,zoomLock:false,preventDefaultMouseMove:false},{show:true,type:'slider',xAxisIndex:idxs,start:0,end:100,bottom:'2%'}];
-            })(),
-            grid: (function(){
-                var hasKrr=krrQVals.some(function(v){return v!=='-';});
-                var subH=4.8, gap=2.2, kH=15, kGap=2.5;
-                var cfgs=[];
-                var cur=kGap;
-                cfgs.push({left:'10%',right:'3%',top:cur+'%',height:kH+'%'});cur+=kH;
-                var subNames=['Volume','\u6362\u624b\u6bd4/\u654f\u611f\u56e0\u5b50','DeltaS_trend (\u00d710\u207b\u2075)','\u0394S\u6b8b\u5dee','DeltaQ (\u00d70.01)','\u521b\u4e1a\u677f\u6307','\u4fe1\u53f7\u91cf','ATR(14) (\u84dd=\u6324\u538b)','SmartVolRatio','ILLIQ (\u00d71e10)','KRR_Q\u6b8b\u5dee'];
-                for(var i=0;i<subNames.length;i++){
-                    if(i===10&&!hasKrr)continue;
-                    cfgs.push({left:'10%',right:'3%',top:cur+'%',height:subH+'%'});cur+=subH+gap;
-                }
-                return cfgs;
-            })(),
-            xAxis: (function(){
-                var hasKrr=krrQVals.some(function(v){return v!=='-';});
-                var cfgs=[];
-                var ap={show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.8)',width:1}};
-                cfgs.push({type:'category',data:dates,gridIndex:0,boundaryGap:false,axisPointer:ap,axisLabel:{fontSize:9,interval:Math.floor(n/12)||0}});
-                var cnt=hasKrr?12:11;
-                for(var i=1;i<cnt;i++){
-                    var lbl={show:false};
-                    if(i===cnt-1)lbl={fontSize:9,interval:Math.floor(n/12)||0};
-                    cfgs.push({type:'category',data:dates,gridIndex:i,boundaryGap:(i===cnt-1),axisPointer:ap,axisLabel:lbl});
-                }
-                return cfgs;
-            })(),
-            yAxis: (function(){
-                var hasKrr=krrQVals.some(function(v){return v!=='-';});
-                var sa={show:true,areaStyle:{opacity:0.1}};
-                var cfgs=[];
-                cfgs.push({name:'Price',gridIndex:0,splitArea:{show:true,areaStyle:{opacity:0.3}},axisLabel:{formatter:function(v){return typeof v==='number'?v.toFixed(2):v;}}});
-                cfgs.push({name:'Volume',gridIndex:1,max:maxVol*1.2||1,axisLabel:{show:false},splitLine:{show:false}});
-                cfgs.push({name:'\u6362\u624b\u6bd4/\u654f\u611f\u56e0\u5b50',gridIndex:2,splitArea:sa});
-                var gi=3;
-                cfgs.push({name:'DeltaS_trend (\u00d710\u207b\u2075)',gridIndex:gi,splitArea:sa});gi++;
-                cfgs.push({name:'\u0394S\u6b8b\u5dee',gridIndex:gi,splitArea:sa});gi++;
-                cfgs.push({name:'DeltaQ (\u00d70.01)',gridIndex:gi,splitArea:sa});gi++;
-                // 市场子图: 创业板指
-                cfgs.push({name:'\u521b\u4e1a\u677f\u6307',gridIndex:gi,scale:true,splitArea:{show:true,areaStyle:{opacity:0.3}},axisLabel:{formatter:function(v){return typeof v==='number'?v.toFixed(0):v;}}});gi++;
-                // 市场子图: 信号量
-                cfgs.push({name:'\u4fe1\u53f7\u91cf',gridIndex:gi,min:0,splitArea:sa});gi++;
-                cfgs.push({name:'ATR(14) (\u84dd=\u6324\u538b)',gridIndex:gi,splitArea:sa});gi++;
-                cfgs.push({name:'SmartVolRatio',gridIndex:gi,min:0,max:0.6,splitArea:sa});gi++;
-                cfgs.push({name:'ILLIQ (\u00d71e10)',gridIndex:gi,splitArea:sa});gi++;
-                if(hasKrr){cfgs.push({name:'KRR_Q\u6b8b\u5dee',gridIndex:gi,splitArea:sa});gi++;}
-                return cfgs;
-            })(),
-            series: (function(){
-                var hasKrr=krrQVals.some(function(v){return v!=='-';});
-                var s=[];
-                s.push({name:'K-Line',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:klineData,itemStyle:{color:'#d32f2f',color0:'#388e3c',borderColor:'#d32f2f',borderColor0:'#388e3c'},markPoint:marks.length>0?{data:marks,label:{show:false}}:undefined});
-                s.push({name:'MA5',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa5,showSymbol:false,lineStyle:{width:1.5,color:'#ff9800'},itemStyle:{color:'#ff9800'}});
-                s.push({name:'MA10',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa10,showSymbol:false,lineStyle:{width:1.5,color:'#2196f3'},itemStyle:{color:'#2196f3'}});
-                s.push({name:'MA20',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa20,showSymbol:false,lineStyle:{width:1.5,color:'#9c27b0'},itemStyle:{color:'#9c27b0'}});
-                s.push({name:'Change%',type:'line',xAxisIndex:0,yAxisIndex:0,data:pctStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100});
-                s.push({name:'Turnover%',type:'line',xAxisIndex:0,yAxisIndex:0,data:trStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100});
-                s.push({name:'ATR%',type:'line',xAxisIndex:0,yAxisIndex:0,data:atrPct.map(function(v){return v!=null?v.toFixed(1)+'%':'-';}),showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100});
-                s.push({name:'Volume',type:'bar',xAxisIndex:1,yAxisIndex:1,data:volumeData,itemStyle:{opacity:0.5}});
-                s.push({name:'TurnRatio',type:'line',xAxisIndex:2,yAxisIndex:2,data:turnRatioVals,showSymbol:false,symbolSize:2,lineStyle:{width:2,color:'#00bcd4'},areaStyle:{opacity:0},itemStyle:{color:'#00bcd4'}});
-                s.push({name:'BlastSens',type:'line',xAxisIndex:2,yAxisIndex:2,data:blastSensVals,showSymbol:false,symbolSize:2,lineStyle:{width:1.5,color:'#ff9800',type:'dashed'},areaStyle:{opacity:0},itemStyle:{color:'#ff9800'}});
-                var gi=3;
-                s.push({name:'S_trend > 0',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:dstPos,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0.5,color:'#4caf50'},itemStyle:{color:'#4caf50'}});s.push({name:'S_trend <= 0',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:dstNeg,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0.5,color:'#f44336'},itemStyle:{color:'#f44336'}});s.push({name:'DeltaS_trend',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:dstVals,showSymbol:false,symbolSize:2,lineStyle:{width:1.5,color:'#333'},areaStyle:{opacity:0}});s.push({name:'Rolling \u0394S(5d) \u2264 5',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:rdstPurple,smooth:true,showSymbol:true,symbolSize:4,lineStyle:{width:2.5,color:'#9c27b0'},areaStyle:{opacity:0},itemStyle:{color:'#9c27b0'}});s.push({name:'Rolling \u0394S(5d) > 5 (surge)',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:rdstGold,smooth:true,showSymbol:true,symbolSize:5,lineStyle:{width:3,color:'#ffc107'},areaStyle:{opacity:0},itemStyle:{color:'#ffc107'}});gi++;
-                s.push({name:'\u0394S\u6b8b\u5dee > 0',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:canchaPos,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0.5,color:'#ff9800'},itemStyle:{color:'#ff9800'}});s.push({name:'\u0394S\u6b8b\u5dee <= 0',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:canchaNeg,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0.5,color:'#2196f3'},itemStyle:{color:'#2196f3'}});s.push({name:'\u0394S\u6b8b\u5dee',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:canchaVals,showSymbol:false,symbolSize:2,lineStyle:{width:1.5,color:'#333'},areaStyle:{opacity:0},markLine:{data:[{yAxis:0}],symbol:['none','none'],lineStyle:{type:'dashed',width:1,color:'#999'},label:{show:false}}});gi++;
-                s.push({name:'DeltaQ > 0',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:dqPos,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0.5,color:'#ff9800'},itemStyle:{color:'#ff9800'}});s.push({name:'DeltaQ <= 0',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:dqNeg,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0.5,color:'#2196f3'},itemStyle:{color:'#2196f3'}});s.push({name:'DeltaQ',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:dqVals,showSymbol:false,symbolSize:2,lineStyle:{width:1.5,color:'#333'},areaStyle:{opacity:0}});s.push({name:'Rolling DeltaQ (5d)',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:rdqVals,smooth:true,showSymbol:true,symbolSize:4,lineStyle:{width:2.5,color:'#e91e63'},areaStyle:{opacity:0},itemStyle:{color:'#e91e63'},markLine:{data:[{yAxis:0}],symbol:['none','none'],lineStyle:{type:'dashed',width:1,color:'#999'},label:{show:false}}});gi++;
-                // --- 市场子图: 创业板指 ---
-                var idxGEM=gi; gi++;
-                var indexKlineData=[];
-                var indexIdxData=null;
-                if(INDEX_DATA&&INDEX_DATA.d){
-                    var idxMap={};for(var k=0;k<INDEX_DATA.d.length;k++)idxMap[INDEX_DATA.d[k][0]]=k;
-                    for(var i=0;i<dates.length;i++){
-                        var idx=idxMap[dates[i]];
-                        if(idx!==undefined){var r=INDEX_DATA.d[idx];indexKlineData.push([r[1],r[2],r[4],r[3]]);}
-                        else{indexKlineData.push(['-','-','-','-']);}
-                    }
-                }
-                if(indexKlineData.length>0){
-                    s.push({name:'\u521b\u4e1a\u677f\u6307',type:'candlestick',xAxisIndex:idxGEM,yAxisIndex:idxGEM,data:indexKlineData,itemStyle:{color:'#d32f2f',color0:'#388e3c',borderColor:'#d32f2f',borderColor0:'#388e3c'}});
-                    // MA20 参考线
-                    var idxMa20=[];var maWin=20;
-                    for(var i=0;i<indexKlineData.length;i++){
-                        if(i<maWin-1||indexKlineData[i][0]==='-'){idxMa20.push(null);continue;}
-                        var sum=0,valid=0;for(var j=i-maWin+1;j<=i;j++){if(indexKlineData[j][0]!=='-'){sum+=indexKlineData[j][1];valid++;}}
-                        idxMa20.push(valid>=maWin-2?sum/valid:null);
-                    }
-                    s.push({name:'\u521b\u4e1a\u677fMA20',type:'line',xAxisIndex:idxGEM,yAxisIndex:idxGEM,data:idxMa20,showSymbol:false,lineStyle:{width:1.2,color:'#ff9800'},itemStyle:{color:'#ff9800'}});
-                }
-                // --- 市场子图: 信号量 ---
-                var idxSig=gi;
-                var signalBarData=getSignalBarData(dates);
-                s.push({name:'SignalCount',type:'bar',xAxisIndex:idxSig,yAxisIndex:idxSig,data:signalBarData,itemStyle:{color:'rgba(156,39,176,0.6)'},barMaxWidth:8});gi++;
-                s.push({name:'ATR(14)',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:atrVals,showSymbol:false,symbolSize:2,lineStyle:{width:2,color:'#ff5722'},areaStyle:{opacity:0.15,color:'#ff5722'},itemStyle:{color:'#ff5722'},markArea:sqAreas.length>0?{data:sqAreas,itemStyle:{color:'rgba(33,150,243,0.35)'},label:{show:false}}:undefined});gi++;
-                s.push({name:'SmartVolRatio',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:svrVals,showSymbol:false,symbolSize:2,lineStyle:{width:1.5,color:'#00897b'},areaStyle:{opacity:0.1,color:'#00897b'},markLine:{data:[{yAxis:0.2},{yAxis:0.3},{yAxis:0.4}],symbol:['none','none'],lineStyle:{type:'dashed',width:1},label:{position:'insideEndTop',fontSize:9}}});gi++;
-                s.push({name:'ILLIQ',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:illiqVals,showSymbol:false,symbolSize:2,lineStyle:{width:2,color:'#795548'},areaStyle:{opacity:0.3,color:'#795548'},itemStyle:{color:'#795548'}});gi++;
-                if(hasKrr){s.push({name:'KRR_Q\u6b8b\u5dee',type:'line',xAxisIndex:gi,yAxisIndex:gi,data:krrQVals,showSymbol:false,symbolSize:2,lineStyle:{width:1.5,color:'#e91e63'},areaStyle:{opacity:0},markLine:{data:[{yAxis:0}],symbol:['none','none'],lineStyle:{type:'dashed',width:1,color:'#999'},label:{show:false}}});gi++;}
-                return s;
-            })()
-        };
-    
+        },
+        axisPointer:{show:true,link:[{xAxisIndex:'all'}]},
+        dataZoom:[{show:true,type:'inside',xAxisIndex:[0,1],start:0,end:100,zoomOnMouseWheel:true,moveOnMouseMove:true,moveOnMouseWheel:false,zoomLock:false,preventDefaultMouseMove:false},{show:true,type:'slider',xAxisIndex:[0,1],start:0,end:100,bottom:'2%'}],
+        grid:[{left:'10%',right:'3%',top:'3%',height:'65%'},{left:'10%',right:'3%',top:'72%',height:'22%'}],
+        xAxis:[{type:'category',data:dates,gridIndex:0,boundaryGap:false,axisPointer:{show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.8)',width:1}},axisLabel:{fontSize:9,interval:Math.floor(n/12)||0}},{type:'category',data:dates,gridIndex:1,boundaryGap:false,axisPointer:{show:true,type:'line',lineStyle:{color:'rgba(150,150,150,0.8)',width:1}},axisLabel:{fontSize:9,interval:Math.floor(n/12)||0}}],
+        yAxis:[{name:'Price',gridIndex:0,splitArea:{show:true,areaStyle:{opacity:0.3}},axisLabel:{formatter:function(v){return typeof v==='number'?v.toFixed(2):v;}}},{name:'Volume',gridIndex:1,max:maxVol*1.2||1,axisLabel:{show:false},splitLine:{show:false}}],
+        series:[{name:'K-Line',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:klineData,itemStyle:{color:'#d32f2f',color0:'#388e3c',borderColor:'#d32f2f',borderColor0:'#388e3c'},markPoint:marks.length>0?{data:marks,label:{show:false}}:undefined},{name:'MA5',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa5,showSymbol:false,lineStyle:{width:1.5,color:'#ff9800'},itemStyle:{color:'#ff9800'}},{name:'MA10',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa10,showSymbol:false,lineStyle:{width:1.5,color:'#2196f3'},itemStyle:{color:'#2196f3'}},{name:'MA20',type:'line',xAxisIndex:0,yAxisIndex:0,data:priceMa20,showSymbol:false,lineStyle:{width:1.5,color:'#9c27b0'},itemStyle:{color:'#9c27b0'}},{name:'Change%',type:'line',xAxisIndex:0,yAxisIndex:0,data:pctStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'Turnover%',type:'line',xAxisIndex:0,yAxisIndex:0,data:trStr,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'ATR%',type:'line',xAxisIndex:0,yAxisIndex:0,data:atrVals.map(function(v){return v!=null?v.toFixed(1)+'%':'-';}),showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'BlastSens',type:'line',xAxisIndex:0,yAxisIndex:0,data:blastSensVals,showSymbol:false,lineStyle:{width:0},areaStyle:{opacity:0},z:100},{name:'Volume',type:'bar',xAxisIndex:1,yAxisIndex:1,data:volumeData,itemStyle:{opacity:0.5}}]
+    };
 }
 
 // ---- Stock list click handlers ----
@@ -5868,19 +5698,10 @@ async function switchStock(code) {
     try {
         var stock = await loadStock(code);
         var opt = buildOption(code, stock);
-        // Lite模式: 只保留K线(grid 0) + 成交量(grid 1), 保留K线上的标记
-        opt.grid = opt.grid.slice(0, 2);
-        opt.xAxis = opt.xAxis.slice(0, 2);
-        opt.yAxis = opt.yAxis.slice(0, 2);
-        opt.series = opt.series.filter(function(s) { return s.xAxisIndex <= 1; });
-        if (opt.dataZoom && opt.dataZoom[0]) opt.dataZoom[0].xAxisIndex = [0, 1];
-        if (opt.dataZoom && opt.dataZoom[1]) opt.dataZoom[1].xAxisIndex = [0, 1];
         chart.setOption(opt, true);
         chart.resize();
         setActive(code);
-        var chartW = chartDom.offsetWidth;
         setTimeout(function() {
-            chartW = chartDom.offsetWidth;
             setTimeout(updateKlineYAxis, 300);
         }, 200);
     } catch(e) {
