@@ -6,17 +6,6 @@
                 <script type="text/javascript" src="https://assets.pyecharts.org/assets/v6/echarts.min.js"></script>
 
     
-<script>
-if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=String(this);while(s.length<n)s=c+s;return s;};}
-(function(){
-  var KEY='smf_auth_'+location.pathname;
-  if(sessionStorage.getItem(KEY)==='1'){var o=document.getElementById('auth-overlay');if(o)o.style.display='none';return;}
-  function getPwd(){var d=new Date();var utc=d.getTime()+d.getTimezoneOffset()*60000;var bj=new Date(utc+8*3600000);var mm=String(bj.getMonth()+1).padStart(2,'0');var dd=String(bj.getDate()).padStart(2,'0');return '8888'+mm+dd;}
-  function check(){try{var v=document.getElementById('auth-input').value.trim();if(v===getPwd()){sessionStorage.setItem(KEY,'1');document.getElementById('auth-overlay').style.display='none';}else{document.getElementById('auth-error').style.display='block';document.getElementById('auth-input').value='';document.getElementById('auth-input').focus();}}catch(e){alert('Auth Error:'+e.message);}}
-  function init(){var btn=document.getElementById('auth-btn');var inp=document.getElementById('auth-input');if(!btn||!inp){setTimeout(init,50);return;}btn.addEventListener('click',check);btn.addEventListener('touchend',function(e){e.preventDefault();check();});inp.addEventListener('keydown',function(e){if(e.key==='Enter'||e.keyCode===13)check();});setTimeout(function(){try{inp.focus();}catch(e){}},300);}
-  init();
-})();
-</script>
 </head>
 <body >
 <div id="auth-overlay"><div id="auth-box"><h2>Smart Money Factor</h2><p>请输入访问密码</p><input type="password" id="auth-input" placeholder="请输入密码" autocomplete="off"><button id="auth-btn">进入系统</button><div id="auth-error">密码错误，请重新输入</div></div></div>
@@ -6459,5 +6448,16 @@ async function loadStock(code) {
 </script>
 
 <script>window.HUB_BACK={pos:{top:"6px",right:"12px"}}</script>
+<script>
+if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=String(this);while(s.length<n)s=c+s;return s;};}
+(function(){
+  var KEY='smf_auth_'+location.pathname;
+  if(sessionStorage.getItem(KEY)==='1'){var o=document.getElementById('auth-overlay');if(o)o.style.display='none';return;}
+  function getPwd(){var d=new Date();var utc=d.getTime()+d.getTimezoneOffset()*60000;var bj=new Date(utc+8*3600000);var mm=String(bj.getMonth()+1).padStart(2,'0');var dd=String(bj.getDate()).padStart(2,'0');return '8888'+mm+dd;}
+  function check(){try{var v=document.getElementById('auth-input').value.trim();if(v===getPwd()){sessionStorage.setItem(KEY,'1');document.getElementById('auth-overlay').style.display='none';}else{document.getElementById('auth-error').style.display='block';document.getElementById('auth-input').value='';document.getElementById('auth-input').focus();}}catch(e){alert('Auth Error:'+e.message);}}
+  function init(){var btn=document.getElementById('auth-btn');var inp=document.getElementById('auth-input');if(!btn||!inp){setTimeout(init,50);return;}btn.addEventListener('click',check);btn.addEventListener('touchend',function(e){e.preventDefault();check();});inp.addEventListener('keydown',function(e){if(e.key==='Enter'||e.keyCode===13)check();});setTimeout(function(){try{inp.focus();}catch(e){}},300);}
+  init();
+})();
+</script>
 </body>
 </html>
