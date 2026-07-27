@@ -5471,22 +5471,9 @@ function buildOption(code, stock) {
         var isRed=dst!=='-'&&dst>5&&tr!=null&&tr>10&&tr<19;
         var isYellow=dst!=='-'&&dst>5&&tr!=null&&tr>5&&tr<10;
         if(isRed||isYellow){
-            var filtered=false;
-            var c=data[i].close;
-            if(canchaVals[i]==='-'||canchaVals[i]<=0) filtered=true;
-            if(!filtered&&i>0){var pDq=rdqVals[i-1],pTr=trVals[i-1];if(pDq!=='-'&&pDq>1.8&&pTr!=null&&pTr>10) filtered=true;}
-            if(!filtered){for(var j=Math.max(0,i-5);j<i;j++){if(signalDays[j]&&data[j].close<c){filtered=true;break;}}}
-            if(!filtered){
-                var oo=data[i].open,hh=data[i].high,ll=data[i].low;
-                var us=hh-Math.max(oo,c),ls=Math.min(oo,c)-ll,bd=Math.abs(c-oo),tr2=hh-ll;
-                var cond1=bd>0&&us>bd*2.5;
-                var cond2=tr2>0&&us/tr2>0.6;
-                var cond3=bd>0&&ls<bd*0.5;
-                var cond4=i>0&&data[i-1].close>0&&tr2/data[i-1].close*100>6;
-                var cond5=bd>0&&atrVals[i]!=='-'&&bd>atrVals[i]*0.002;
-                if(cond1&&cond2&&cond3&&cond4&&cond5) filtered=true;
-            }
-            if(!filtered){var color=isRed?'#ff0000':'#ffc107';marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:color}});signalDays[i]=true;}
+            var color=isRed?'#ff0000':'#ffc107';
+            marks.push({coord:[dates[i],lp],symbol:'triangle',symbolSize:15,itemStyle:{color:color}});
+            signalDays[i]=true;
         }
     }
     // 五角星合并
