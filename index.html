@@ -104,7 +104,7 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
     <label><input type="checkbox" data-board="star"> 科创板 <span class="filter-count">(607)</span></label>
   </div>
   <div id="st-filter">
-    <label><input type="checkbox" id="hide-st-checkbox" checked> 剔除ST股 (<span id="st-count">215</span>)</label>
+    <label><input type="checkbox" id="hide-st-checkbox" checked> 剔除ST股 (<span id="st-count">216</span>)</label>
   </div>
   <div id="stock-list-container">
     <div class="stock-item" data-code="300295.XSHE" data-board="chinext" data-st="st">*ST三六五<br><small>300295.XSHE</small></div>
@@ -1124,6 +1124,7 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 <div class="stock-item" data-code="000615.XSHE" data-board="szmb" data-st="st">*ST美谷<br><small>000615.XSHE</small></div>
 <div class="stock-item" data-code="603272.XSHG" data-board="shmb" data-st="st">*ST联翔<br><small>603272.XSHG</small></div>
 <div class="stock-item" data-code="688066.XSHG" data-board="star" data-st="st">*ST航图<br><small>688066.XSHG</small></div>
+<div class="stock-item" data-code="000820.XSHE" data-board="szmb" data-st="st">*ST节能<br><small>000820.XSHE</small></div>
 <div class="stock-item" data-code="002528.XSHE" data-board="sme" data-st="st">*ST英飞<br><small>002528.XSHE</small></div>
 <div class="stock-item" data-code="600543.XSHG" data-board="shmb" data-st="st">*ST莫高<br><small>600543.XSHG</small></div>
 <div class="stock-item" data-code="000752.XSHE" data-board="szmb" data-st="st">*ST西发<br><small>000752.XSHE</small></div>
@@ -1146,7 +1147,6 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 <div class="stock-item" data-code="600818.XSHG" data-board="shmb" data-st="st">ST中路<br><small>600818.XSHG</small></div>
 <div class="stock-item" data-code="000903.XSHE" data-board="szmb" data-st="st">ST云动<br><small>000903.XSHE</small></div>
 <div class="stock-item" data-code="600239.XSHG" data-board="shmb" data-st="st">ST云城<br><small>600239.XSHG</small></div>
-<div class="stock-item" data-code="600530.XSHG" data-board="shmb" data-st="st">ST交昂<br><small>600530.XSHG</small></div>
 <div class="stock-item" data-code="000821.XSHE" data-board="szmb" data-st="st">ST京机<br><small>000821.XSHE</small></div>
 <div class="stock-item" data-code="000711.XSHE" data-board="szmb" data-st="st">ST京蓝<br><small>000711.XSHE</small></div>
 <div class="stock-item" data-code="600079.XSHG" data-board="shmb" data-st="st">ST人福<br><small>600079.XSHG</small></div>
@@ -1206,6 +1206,7 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 <div class="stock-item" data-code="002512.XSHE" data-board="sme" data-st="st">ST达华<br><small>002512.XSHE</small></div>
 <div class="stock-item" data-code="002689.XSHE" data-board="sme" data-st="st">ST远智<br><small>002689.XSHE</small></div>
 <div class="stock-item" data-code="600365.XSHG" data-board="shmb" data-st="st">ST通葡<br><small>600365.XSHG</small></div>
+<div class="stock-item" data-code="688646.XSHG" data-board="star" data-st="st">ST逸飞<br><small>688646.XSHG</small></div>
 <div class="stock-item" data-code="600080.XSHG" data-board="shmb" data-st="st">ST金花<br><small>600080.XSHG</small></div>
 <div class="stock-item" data-code="600678.XSHG" data-board="shmb" data-st="st">ST金顶<br><small>600678.XSHG</small></div>
 <div class="stock-item" data-code="000669.XSHE" data-board="szmb" data-st="st">ST金鸿<br><small>000669.XSHE</small></div>
@@ -1767,6 +1768,7 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 <div class="stock-item" data-code="603188.XSHG" data-board="shmb" data-st="normal">亚邦股份<br><small>603188.XSHG</small></div>
 <div class="stock-item" data-code="000893.XSHE" data-board="szmb" data-st="normal">亚钾国际<br><small>000893.XSHE</small></div>
 <div class="stock-item" data-code="301220.XSHE" data-board="chinext" data-st="normal">亚香股份<br><small>301220.XSHE</small></div>
+<div class="stock-item" data-code="600530.XSHG" data-board="shmb" data-st="normal">交大昂立<br><small>600530.XSHG</small></div>
 <div class="stock-item" data-code="603815.XSHG" data-board="shmb" data-st="normal">交建股份<br><small>603815.XSHG</small></div>
 <div class="stock-item" data-code="002200.XSHE" data-board="sme" data-st="normal">交投生态<br><small>002200.XSHE</small></div>
 <div class="stock-item" data-code="688015.XSHG" data-board="star" data-st="normal">交控科技<br><small>688015.XSHG</small></div>
@@ -4306,7 +4308,6 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 <div class="stock-item" data-code="002278.XSHE" data-board="sme" data-st="normal">神开股份<br><small>002278.XSHE</small></div>
 <div class="stock-item" data-code="000933.XSHE" data-board="szmb" data-st="normal">神火股份<br><small>000933.XSHE</small></div>
 <div class="stock-item" data-code="605228.XSHG" data-board="shmb" data-st="normal">神通科技<br><small>605228.XSHG</small></div>
-<div class="stock-item" data-code="000820.XSHE" data-board="szmb" data-st="normal">神雾节能<br><small>000820.XSHE</small></div>
 <div class="stock-item" data-code="603530.XSHG" data-board="shmb" data-st="normal">神马电力<br><small>603530.XSHG</small></div>
 <div class="stock-item" data-code="600810.XSHG" data-board="shmb" data-st="normal">神马股份<br><small>600810.XSHG</small></div>
 <div class="stock-item" data-code="603109.XSHG" data-board="shmb" data-st="normal">神驰机电<br><small>603109.XSHG</small></div>
@@ -4913,7 +4914,6 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,c){var s=Str
 <div class="stock-item" data-code="002491.XSHE" data-board="sme" data-st="normal">通鼎互联<br><small>002491.XSHE</small></div>
 <div class="stock-item" data-code="001277.XSHE" data-board="szmb" data-st="normal">速达股份<br><small>001277.XSHE</small></div>
 <div class="stock-item" data-code="301176.XSHE" data-board="chinext" data-st="normal">逸豪新材<br><small>301176.XSHE</small></div>
-<div class="stock-item" data-code="688646.XSHG" data-board="star" data-st="normal">逸飞激光<br><small>688646.XSHG</small></div>
 <div class="stock-item" data-code="002838.XSHE" data-board="sme" data-st="normal">道恩股份<br><small>002838.XSHE</small></div>
 <div class="stock-item" data-code="002632.XSHE" data-board="sme" data-st="normal">道明光学<br><small>002632.XSHE</small></div>
 <div class="stock-item" data-code="601026.XSHG" data-board="shmb" data-st="normal">道生天合<br><small>601026.XSHG</small></div>
